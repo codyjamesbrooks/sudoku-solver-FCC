@@ -1,16 +1,4 @@
 class SudokuSolver {
-  rowLetterToIndexRange = {
-    A: "0-8",
-    B: "9-17",
-    C: "18-26",
-    D: "27-35",
-    E: "36-44",
-    F: "45-53",
-    G: "54-62",
-    H: "63-71",
-    I: "72-80",
-  };
-
   onlyUniqueNumbers(string) {
     let numbers = string.replaceAll(".", "");
     let numbersInString = numbers.length;
@@ -20,32 +8,37 @@ class SudokuSolver {
   }
 
   validate(puzzleString) {
-    let puzzleRows = puzzleString.match(/.{1,9}/g);
+    // validate rows
+    let puzzleRows = "ABCDEFGHI"
+      .split("")
+      .map((row) => this.getRowValues(puzzleString, row));
+
     let areRowsValid = new Set(
       puzzleRows.map((rowString) => this.onlyUniqueNumbers(rowString))
     );
     if (areRowsValid.size !== 1 || areRowsValid.has(false)) return false;
 
-    let puzzleCols = [];
-    for (let i = 0; i <= 8; i++) {
-      let x = 0;
-      puzzleCols[i] = [];
-      puzzleRows.map((row) => puzzleCols[i].push(row[i]));
-      puzzleCols[i] = puzzleCols[i].join("");
-    }
+    // validate columns
+    let puzzleCols = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((column) =>
+      this.getColumnValues(puzzleString, column)
+    );
     let areColsValid = new Set(
       puzzleCols.map((colString) => this.onlyUniqueNumbers(colString))
     );
     if (areColsValid.size !== 1 || areColsValid.has(false)) return false;
 
-    let puzzleRegions = new Array(9).fill([]);
-    for (let i = 0; i <= 8; i++) {
-      let rowRegionGroup = puzzleRows[i].match(/.{1,3}/g);
-      puzzleRegionIndex = Math.floor(i / 3) * 3;
-      rowRegionGroup.forEach((value, index) => {
-        puzzleRegions[puzzleRegionIndex + index].push(value);
-      });
-    }
+    //validate regions
+    let puzzleRegions = [
+      ["A", 1],
+      ["A", 4],
+      ["A", 7],
+      ["D", 1],
+      ["D", 4],
+      ["D", 7],
+      ["G", 1],
+      ["G", 4],
+      ["G", 7],
+    ].map(([row, column]) => this.getRegionValues(puzzleString, row, column));
     let areRegionsValid = new Set(
       puzzleRegions.map((regionString) => this.onlyUniqueNumbers(regionString))
     );
@@ -54,24 +47,76 @@ class SudokuSolver {
     return true;
   }
 
-  // You can POST to /api/check an object containing puzzle, coordinate, and
-  // value where the coordinate is the letter A-I indicating the row, followed
-  // by a number 1-9 indicating the column, and value is a number from 1-9.
-
   checkRowPlacement(puzzleString, row, column, value) {
-    let rowStartIndex, rowEndIndex;
-    [rowStartIndex, rowEndIndex] = this.rowLetterToIndexRange[row].split("-");
-    let updatedRow = puzzleString.slice(+rowStartIndex, +rowEndIndex + 1);
+    let currentRow = this.getRowValues(puzzleString, row);
 
-    updatedRow = updatedRow.slice(0, col - 1) + value + updatedRow.slice(col);
+    let updatedRow =
+      currentRow.slice(0, column - 1) + value + currentRow.slice(column);
     return this.onlyUniqueNumbers(updatedRow);
   }
 
-  checkColPlacement(puzzleString, row, column, value) {}
+  checkColPlacement(puzzleString, row, column, value) {
+    let currentColumn = this.getColumnValues(puzzleString, column);
 
-  checkRegionPlacement(puzzleString, row, column, value) {}
+    let subPosition = "ABCDEFGHI".indexOf(row) - 1;
+    let updatedCol =
+      currentColumn.slice(0, subPosition) +
+      value +
+      currentColumn.slice(subPosition + 1);
+    return this.onlyUniqueNumbers(updatedCol);
+  }
+
+  checkRegionPlacement(puzzleString, row, column, value) {
+    let currentRegion = this.getRegionValues(puzzleString, row, column);
+
+    let replaceIndex = ("ABCDEFGHI".indexOf(row) % 3) * 3 + ((column - 1) % 3);
+    let updatedRegion =
+      currentRegion.slice(0, replaceIndex) +
+      value +
+      currentRegion.slice(replaceIndex + 1);
+
+    return this.onlyUniqueNumbers(updatedRegion);
+  }
 
   solve(puzzleString) {}
+
+  getRowValues(puzzleString, row) {
+    let rowStartIndex = "ABCDEFGHI".indexOf(row) * 9;
+    let currentRow = puzzleString.slice(rowStartIndex, rowStartIndex + 9);
+    return currentRow;
+  }
+
+  getColumnValues(puzzleString, column) {
+    let colIndex = column - 1;
+    let currentCol = "";
+
+    while (colIndex < puzzleString.length) {
+      currentCol += puzzleString[colIndex];
+      colIndex += 9;
+    }
+
+    return currentCol;
+  }
+
+  getRegionValues(puzzleString, row, column) {
+    let regionRowStart = Math.floor("ABCDEFGHI".indexOf(row) / 3) * 3;
+    let regionColStart = Math.floor((column - 1) / 3) * 3;
+
+    let regionStartingIndex = regionRowStart * 9 + regionColStart;
+
+    let count = 0;
+    let currentRegion = "";
+    while (count < 3) {
+      currentRegion += puzzleString.slice(
+        regionStartingIndex,
+        regionStartingIndex + 3
+      );
+      regionStartingIndex += 9;
+      count += 1;
+    }
+
+    return currentRegion;
+  }
 }
 
 module.exports = SudokuSolver;
