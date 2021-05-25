@@ -10,7 +10,7 @@ const invalidCharacters =
 let invalidPuzzle, randomSliceIndex, randomInvalidChar;
 
 suite("UnitTests", () => {
-  suite("testing Solver validate method", function () {
+  suite("testing Solver validate() method", () => {
     test("correctly validates valid puzzles", () => {
       for (let i = 0; i < puzzles.length; i++) {
         assert.deepEqual(
@@ -26,7 +26,7 @@ suite("UnitTests", () => {
     test("returns error msg when puzzle string has invalid characters", () => {
       for (let i = 0; i < puzzles.length; i++) {
         invalidPuzzle = puzzles[i][0].slice();
-        randomSliceIndex = Math.floor(Math.random() * 81);
+        randomSliceIndex = Math.floor(Math.random() * 80);
         randomInvalidChar = invalidCharacters.charAt(
           Math.floor(Math.random() * 75)
         );
@@ -61,6 +61,25 @@ suite("UnitTests", () => {
         },
         "Failed to identify long puzzle"
       );
+    });
+  });
+  suite("testing Solver checkRowPlacement() method", () => {
+    let value, row, column, randomIndex;
+    test("Correct response to valid row placement", () => {
+      for (let i = 0; i < puzzles.length; i++) {
+        randomIndex = Math.floor(Math.random() * 80);
+        value = puzzles[i][1].charAt(randomIndex);
+        row = "ABCDEFGHI".charAt(Math.floor(randomIndex / 9));
+        column = (randomIndex % 9) + 1;
+
+        console.log(`random: ${randomIndex}, value: ${value}`);
+        console.log(`row: ${row} column: ${column}`);
+
+        assert.isTrue(
+          solver.checkRowPlacement(puzzles[i][0], row, column, value),
+          `incorrectly rejected value: ${value} at correct postion: ${row}${column}`
+        );
+      }
     });
   });
 });
