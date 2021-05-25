@@ -78,7 +78,38 @@ class SudokuSolver {
     return this.onlyUniqueNumbers(updatedRegion);
   }
 
-  solve(puzzleString) {}
+  solve(puzzleString) {
+    let solvedPuzzle = (" " + puzzleString).slice(1);
+
+    while (/\./.test(solvedPuzzle)) {
+      for (let i = 0; i < solvedPuzzle.length; i++) {
+        if (solvedPuzzle[i] !== ".") continue;
+
+        let row = "ABCDEFGHI".charAt(Math.floor(i / 9));
+        let column = (i % 9) + 1;
+
+        let options = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+        let rowValues = this.getRowValues(solvedPuzzle, row);
+        let colValues = this.getColumnValues(solvedPuzzle, column);
+        let regionValues = this.getRegionValues(solvedPuzzle, row, column);
+
+        options = options.filter((option) => {
+          return (
+            rowValues.indexOf(option) < 0 &&
+            colValues.indexOf(option) < 0 &&
+            regionValues.indexOf(option) < 0
+          );
+        });
+        console.log(`options: ${options}, length: ${options.length}`);
+        if (options.length === 1) {
+          solvedPuzzle =
+            solvedPuzzle.slice(0, i) + options[0] + solvedPuzzle.slice(i + 1);
+        }
+        console.log(solvedPuzzle);
+      }
+    }
+  }
 
   getRowValues(puzzleString, row) {
     let rowStartIndex = "ABCDEFGHI".indexOf(row) * 9;
@@ -114,7 +145,6 @@ class SudokuSolver {
       regionStartingIndex += 9;
       count += 1;
     }
-
     return currentRegion;
   }
 }
