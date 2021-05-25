@@ -1,6 +1,6 @@
 class SudokuSolver {
-  onlyUniqueNumbers(string) {
-    let numbers = string.replaceAll(".", "");
+  onlyUniqueNumbers(puzzleStringSubset) {
+    let numbers = puzzleStringSubset.replace(/\./g, "");
     let numbersInString = numbers.length;
 
     let uniqueNumbers = new Set(numbers.split(""));
@@ -8,6 +8,19 @@ class SudokuSolver {
   }
 
   validate(puzzleString) {
+    // function checks if a puzzle is valid. Returns a msg object.
+    // Below are the msg options.
+    // error: "Required field missing" - Note The puzzle submitted was an empty string
+    // error: "Invalid characters in puzzle" - Puzzle has characters other than "." and 1-9
+    // error: "Expected puzzle to be 81 characters long"
+    // error: "Puzzle cannot be solved"
+
+    if (puzzleString === "") return { error: "Required field missing" };
+    if (/[^\.1-9]/.test(puzzleString))
+      return { error: "Invalid characters in puzzle" };
+    if (puzzleString.length !== 81)
+      return { error: "Expected puzzle to be 81 characters long" };
+
     // validate rows
     let puzzleRows = "ABCDEFGHI"
       .split("")
@@ -16,7 +29,8 @@ class SudokuSolver {
     let areRowsValid = new Set(
       puzzleRows.map((rowString) => this.onlyUniqueNumbers(rowString))
     );
-    if (areRowsValid.size !== 1 || areRowsValid.has(false)) return false;
+    if (areRowsValid.size !== 1 || areRowsValid.has(false))
+      return { error: "Puzzle cannot be solved" };
 
     // validate columns
     let puzzleCols = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((column) =>
@@ -25,7 +39,8 @@ class SudokuSolver {
     let areColsValid = new Set(
       puzzleCols.map((colString) => this.onlyUniqueNumbers(colString))
     );
-    if (areColsValid.size !== 1 || areColsValid.has(false)) return false;
+    if (areColsValid.size !== 1 || areColsValid.has(false))
+      return { error: "Puzzle cannot be solved" };
 
     //validate regions
     let puzzleRegions = [
@@ -42,9 +57,10 @@ class SudokuSolver {
     let areRegionsValid = new Set(
       puzzleRegions.map((regionString) => this.onlyUniqueNumbers(regionString))
     );
-    if (areRegionsValid.size !== 1 || areRegionsValid.has(false)) return false;
+    if (areRegionsValid.size !== 1 || areRegionsValid.has(false))
+      return { error: "Puzzle cannot be solved" };
 
-    return true;
+    return { solution: "" };
   }
 
   checkRowPlacement(puzzleString, row, column, value) {
@@ -80,8 +96,11 @@ class SudokuSolver {
 
   solve(puzzleString) {
     let solvedPuzzle = (" " + puzzleString).slice(1);
+    let unsolvedNumbers;
 
     while (/\./.test(solvedPuzzle)) {
+      unsolvedNumbers = solvedPuzzle.match(/\./g).length;
+
       for (let i = 0; i < solvedPuzzle.length; i++) {
         if (solvedPuzzle[i] !== ".") continue;
 
@@ -101,13 +120,14 @@ class SudokuSolver {
             regionValues.indexOf(option) < 0
           );
         });
-        console.log(`options: ${options}, length: ${options.length}`);
         if (options.length === 1) {
           solvedPuzzle =
             solvedPuzzle.slice(0, i) + options[0] + solvedPuzzle.slice(i + 1);
         }
-        console.log(solvedPuzzle);
       }
+
+      if (solvedPuzzle.match(/\./g).length >= unsolvedNumbers)
+        return { error: "Puzzle cannot be solved" };
     }
     return solvedPuzzle;
   }

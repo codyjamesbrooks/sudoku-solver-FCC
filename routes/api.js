@@ -14,12 +14,10 @@ module.exports = function (app) {
     // periods . to represent empty spaces. The returned object will contain
     // a solution property with the solved puzzle.
     .post((req, res) => {
-      if (!req.body.puzzle)
-        return res.json({ error: "Required field missing" });
-      if (/[^\d\.]/.test(req.body.puzzle))
-        return res.json({ error: "Invalid characters in puzzle" });
+      let responseObject = solver.validate(req.body.puzzle);
 
-      let solvedPuzzle = solver.solve(req.body.puzzle);
-      return res.json({ solution: solvedPuzzle });
+      if (responseObject.hasOwnProperty("error")) {
+        return res.json(responseObject);
+      }
     });
 };
