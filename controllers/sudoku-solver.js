@@ -14,6 +14,7 @@ class SudokuSolver {
     // error: "Invalid characters in puzzle" - Puzzle has characters other than "." and 1-9
     // error: "Expected puzzle to be 81 characters long"
     // error: "Puzzle cannot be solved"
+    // valid: true
 
     if (puzzleString === "") return { error: "Required field missing" };
     if (/[^\.1-9]/.test(puzzleString))
@@ -60,7 +61,7 @@ class SudokuSolver {
     if (areRegionsValid.size !== 1 || areRegionsValid.has(false))
       return { error: "Puzzle cannot be solved" };
 
-    return { solution: "" };
+    return { valid: true };
   }
 
   checkRowPlacement(puzzleString, row, column, value) {
@@ -96,11 +97,10 @@ class SudokuSolver {
 
   solve(puzzleString) {
     let solvedPuzzle = (" " + puzzleString).slice(1);
-    let unsolvedNumbers;
+    let solvedNumbers = 0;
 
     while (/\./.test(solvedPuzzle)) {
-      unsolvedNumbers = solvedPuzzle.match(/\./g).length;
-
+      solvedNumbers = 0;
       for (let i = 0; i < solvedPuzzle.length; i++) {
         if (solvedPuzzle[i] !== ".") continue;
 
@@ -120,16 +120,17 @@ class SudokuSolver {
             regionValues.indexOf(option) < 0
           );
         });
+
         if (options.length === 1) {
           solvedPuzzle =
             solvedPuzzle.slice(0, i) + options[0] + solvedPuzzle.slice(i + 1);
+          solvedNumbers += 1;
         }
       }
 
-      if (solvedPuzzle.match(/\./g).length >= unsolvedNumbers)
-        return { error: "Puzzle cannot be solved" };
+      if (!solvedNumbers) return { error: "Puzzle cannot be solved" };
     }
-    return solvedPuzzle;
+    return { solution: solvedPuzzle };
   }
 
   getRowValues(puzzleString, row) {

@@ -19,5 +19,8 @@ module.exports = function (app) {
       if (responseObject.hasOwnProperty("error")) {
         return res.json(responseObject);
       }
+
+      responseObject = solver.solve(req.body.puzzle);
+      return res.json(responseObject);
     });
 };
