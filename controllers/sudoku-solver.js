@@ -109,6 +109,7 @@ class SudokuSolver {
         console.log(solvedPuzzle);
       }
     }
+    return solvedPuzzle;
   }
 
   getRowValues(puzzleString, row) {
