@@ -161,7 +161,26 @@ suite("UnitTests", () => {
       }
     });
   });
-  suite("Solver solver() method", () => {});
+  suite("Solver solver() method", () => {
+    test("Correctly solves valid puzzle strings", () => {
+      for (let i = 0; i < puzzles.length; i++) {
+        assert.deepEqual(
+          solver.solve(puzzles[i][0]),
+          { solution: puzzles[i][1] },
+          `Error in puzzle solve. unsolved: ${puzzles[i][0]} solved: ${puzzles[i][1]}`
+        );
+      }
+    });
+    let invalidPuzzleString;
+    test("Invalid puzzle strings fail the solve method", () => {
+      invalidPuzzleString = ".".repeat(81);
+      assert.deepEqual(
+        solver.solve(invalidPuzzleString),
+        { error: "Puzzle cannot be solved" },
+        "failed to flag invalid puzzle"
+      );
+    });
+  });
 });
 
 // Valid puzzle strings pass the solver
