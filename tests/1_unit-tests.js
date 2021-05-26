@@ -104,11 +104,6 @@ suite("UnitTests", () => {
         row = "ABCDEFGHI".charAt(Math.floor(randomIndex / 9));
         column = (randomIndex % 9) + 1;
 
-        console.log("Puzzle: " + puzzles[i]);
-        console.log("value: " + value);
-        console.log("row: " + row);
-        console.log("column: " + column);
-
         assert.deepEqual(
           solver.checkColPlacement(puzzles[i][0], row, column, value),
           { valid: true },
@@ -116,9 +111,26 @@ suite("UnitTests", () => {
         );
       }
     });
+
+    let colValues;
+    test("Correct response to invalid col placement", () => {
+      for (let i = 0; i < puzzles.length; i++) {
+        randomIndex = Math.floor(Math.random() * 80);
+        column = (randomIndex % 9) + 1;
+        colValues = solver.getColumnValues(puzzles[i][0], column);
+        row = "ABCDEFGHI".charAt(colValues.indexOf("."));
+        value = colValues.match(/\d/);
+
+        assert.deepEqual(
+          solver.checkColPlacement(puzzles[i][0], row, column, value),
+          { conflict: "column" },
+          "failed to notice col conflict"
+        );
+      }
+    });
   });
 });
-// Logic handles a valid column placement
+
 // Logic handles an invalid column placement
 // Logic handles a valid region (3x3 grid) placement
 // Logic handles an invalid region (3x3 grid) placement
