@@ -104,10 +104,11 @@ class SudokuSolver {
 
   solve(puzzleString) {
     let solvedPuzzle = (" " + puzzleString).slice(1);
-    let solvedNumbers = 0;
+    let solvedNumbers;
 
     while (/\./.test(solvedPuzzle)) {
       solvedNumbers = 0;
+
       for (let i = 0; i < solvedPuzzle.length; i++) {
         if (solvedPuzzle[i] !== ".") continue;
 
@@ -137,7 +138,11 @@ class SudokuSolver {
 
       if (!solvedNumbers) return { error: "Puzzle cannot be solved" };
     }
-    return { solution: solvedPuzzle };
+
+    let validator = this.validate(solvedPuzzle);
+    return validator.hasOwnProperty("valid")
+      ? { solution: solvedPuzzle }
+      : { error: "Puzzle cannot be solved" };
   }
 
   getRowValues(puzzleString, row) {

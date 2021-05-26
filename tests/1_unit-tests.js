@@ -171,8 +171,20 @@ suite("UnitTests", () => {
         );
       }
     });
-    let invalidPuzzleString;
+    let invalidPuzzleString, invalidCharacter;
     test("Invalid puzzle strings fail the solve method", () => {
+      for (let i = 0; i < puzzles.length; i++) {
+        invalidCharacter = puzzles[i][0].slice(1).match(/\d/);
+        invalidPuzzleString = invalidCharacter + puzzles[i][0].slice(1);
+
+        assert.deepEqual(
+          solver.solve(invalidPuzzleString),
+          { error: "Puzzle cannot be solved" },
+          "Failed to send error on invalid puzzle solve"
+        );
+      }
+    });
+    test("Empty puzzle strings fail the solve method", () => {
       invalidPuzzleString = ".".repeat(81);
       assert.deepEqual(
         solver.solve(invalidPuzzleString),
@@ -183,6 +195,4 @@ suite("UnitTests", () => {
   });
 });
 
-// Valid puzzle strings pass the solver
-// Invalid puzzle strings fail the solver
 // Solver returns the the expected solution for an incomplete puzzle
