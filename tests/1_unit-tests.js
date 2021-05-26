@@ -72,18 +72,32 @@ suite("UnitTests", () => {
         row = "ABCDEFGHI".charAt(Math.floor(randomIndex / 9));
         column = (randomIndex % 9) + 1;
 
-        console.log(`random: ${randomIndex}, value: ${value}`);
-        console.log(`row: ${row} column: ${column}`);
-
-        assert.isTrue(
+        assert.deepEqual(
           solver.checkRowPlacement(puzzles[i][0], row, column, value),
+          {
+            valid: true,
+          },
           `incorrectly rejected value: ${value} at correct postion: ${row}${column}`
+        );
+      }
+    });
+    let rowValues;
+    test("Correct response to invalid row placement", () => {
+      for (let i = 0; i < puzzles.length; i++) {
+        randomIndex = Math.floor(Math.random() * 80);
+        row = "ABCDEFGHI".charAt(Math.floor(randomIndex / 9));
+        rowValues = solver.getRowValues(puzzles[i][0], row);
+        column = rowValues.indexOf(".") + 1;
+        value = rowValues.match(/\d/);
+        assert.deepEqual(
+          solver.checkRowPlacement(puzzles[i][0], row, column, value),
+          { conflict: "row" },
+          "falied to notice row conflict"
         );
       }
     });
   });
 });
-// Logic handles a valid row placement
 // Logic handles an invalid row placement
 // Logic handles a valid column placement
 // Logic handles an invalid column placement

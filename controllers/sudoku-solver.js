@@ -69,7 +69,9 @@ class SudokuSolver {
 
     let updatedRow =
       currentRow.slice(0, column - 1) + value + currentRow.slice(column);
-    return this.onlyUniqueNumbers(updatedRow);
+    return this.onlyUniqueNumbers(updatedRow)
+      ? { valid: true }
+      : { conflict: "row" };
   }
 
   checkColPlacement(puzzleString, row, column, value) {
@@ -80,7 +82,10 @@ class SudokuSolver {
       currentColumn.slice(0, subPosition) +
       value +
       currentColumn.slice(subPosition + 1);
-    return this.onlyUniqueNumbers(updatedCol);
+
+    return this.onlyUniqueNumbers(updatedColumn)
+      ? { valid: true }
+      : { conflict: "column" };
   }
 
   checkRegionPlacement(puzzleString, row, column, value) {
@@ -92,7 +97,9 @@ class SudokuSolver {
       value +
       currentRegion.slice(replaceIndex + 1);
 
-    return this.onlyUniqueNumbers(updatedRegion);
+    return this.onlyUniqueNumbers(updatedRegion)
+      ? { valid: true }
+      : { conflict: "region" };
   }
 
   solve(puzzleString) {
