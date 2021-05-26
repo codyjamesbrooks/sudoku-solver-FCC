@@ -129,11 +129,41 @@ suite("UnitTests", () => {
       }
     });
   });
+  suite("Solver checkRegionPlacement() method", () => {
+    let value, row, column, randomIndex;
+    test("Correct response to valid region placement", () => {
+      for (let i = 0; i < puzzles.length; i++) {
+        randomIndex = Math.floor(Math.random() * 80);
+        value = puzzles[i][1].charAt(randomIndex);
+        row = "ABCDEFGHI".charAt(Math.floor(randomIndex / 9));
+        column = (randomIndex % 9) + 1;
+
+        assert.deepEqual(
+          solver.checkRegionPlacement(puzzles[i][0], row, column, value),
+          { valid: true },
+          "Incorrectly flagged valid placement"
+        );
+      }
+    });
+    let regionValues;
+    test("Correct response to invalid col placement", () => {
+      for (let i = 0; i < puzzles.length; i++) {
+        row = "ADG".charAt(Math.floor(Math.random() * 3));
+        column = +"147".charAt(Math.floor(Math.random() * 3));
+        regionValues = solver.getRegionValues(puzzles[i][1], row, column);
+        value = regionValues.charAt(0);
+
+        assert.deepEqual(
+          solver.checkRegionPlacement(puzzles[i][1], row, column + 1, value),
+          { conflict: "region" },
+          "failed to notice region conflict"
+        );
+      }
+    });
+  });
+  suite("Solver solver() method", () => {});
 });
 
-// Logic handles an invalid column placement
-// Logic handles a valid region (3x3 grid) placement
-// Logic handles an invalid region (3x3 grid) placement
 // Valid puzzle strings pass the solver
 // Invalid puzzle strings fail the solver
 // Solver returns the the expected solution for an incomplete puzzle
