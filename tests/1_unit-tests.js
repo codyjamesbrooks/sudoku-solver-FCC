@@ -10,7 +10,7 @@ const invalidCharacters =
 let invalidPuzzle, randomSliceIndex, randomInvalidChar;
 
 suite("UnitTests", () => {
-  suite("testing Solver validate() method", () => {
+  suite("Solver validate() method", () => {
     test("correctly validates valid puzzles", () => {
       for (let i = 0; i < puzzles.length; i++) {
         assert.deepEqual(
@@ -63,7 +63,7 @@ suite("UnitTests", () => {
       );
     });
   });
-  suite("testing Solver checkRowPlacement() method", () => {
+  suite("Solver checkRowPlacement() method", () => {
     let value, row, column, randomIndex;
     test("Correct response to valid row placement", () => {
       for (let i = 0; i < puzzles.length; i++) {
@@ -74,10 +74,8 @@ suite("UnitTests", () => {
 
         assert.deepEqual(
           solver.checkRowPlacement(puzzles[i][0], row, column, value),
-          {
-            valid: true,
-          },
-          `incorrectly rejected value: ${value} at correct postion: ${row}${column}`
+          { valid: true },
+          `${value} at correct postion: ${row}${column}`
         );
       }
     });
@@ -97,8 +95,29 @@ suite("UnitTests", () => {
       }
     });
   });
+  suite("Solver checkColPlacement() method", () => {
+    let value, row, column, randomIndex;
+    test("Correct response to valid col placement", () => {
+      for (let i = 0; i < puzzles.length; i++) {
+        randomIndex = Math.floor(Math.random() * 80);
+        value = puzzles[i][1].charAt(randomIndex);
+        row = "ABCDEFGHI".charAt(Math.floor(randomIndex / 9));
+        column = (randomIndex % 9) + 1;
+
+        console.log("Puzzle: " + puzzles[i]);
+        console.log("value: " + value);
+        console.log("row: " + row);
+        console.log("column: " + column);
+
+        assert.deepEqual(
+          solver.checkColPlacement(puzzles[i][0], row, column, value),
+          { valid: true },
+          `${value} at correct postion: ${row}${column}`
+        );
+      }
+    });
+  });
 });
-// Logic handles an invalid row placement
 // Logic handles a valid column placement
 // Logic handles an invalid column placement
 // Logic handles a valid region (3x3 grid) placement

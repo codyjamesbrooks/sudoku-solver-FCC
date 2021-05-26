@@ -77,8 +77,8 @@ class SudokuSolver {
   checkColPlacement(puzzleString, row, column, value) {
     let currentColumn = this.getColumnValues(puzzleString, column);
 
-    let subPosition = "ABCDEFGHI".indexOf(row) - 1;
-    let updatedCol =
+    let subPosition = "ABCDEFGHI".indexOf(row);
+    let updatedColumn =
       currentColumn.slice(0, subPosition) +
       value +
       currentColumn.slice(subPosition + 1);
