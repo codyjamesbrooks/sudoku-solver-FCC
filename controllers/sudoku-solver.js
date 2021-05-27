@@ -1,12 +1,4 @@
 class SudokuSolver {
-  onlyUniqueNumbers(puzzleStringSubset) {
-    let numbers = puzzleStringSubset.replace(/\./g, "");
-    let numbersInString = numbers.length;
-
-    let uniqueNumbers = new Set(numbers.split(""));
-    return uniqueNumbers.size === numbers.length ? true : false;
-  }
-
   validate(puzzleString) {
     // function checks if a puzzle is valid. Returns a msg object.
     // Below are the msg options.
@@ -16,7 +8,7 @@ class SudokuSolver {
     // error: "Puzzle cannot be solved"
     // valid: true
 
-    if (puzzleString === "") return { error: "Required field missing" };
+    if (!puzzleString) return { error: "Required field missing" };
     if (/[^\.1-9]/.test(puzzleString))
       return { error: "Invalid characters in puzzle" };
     if (puzzleString.length !== 81)
@@ -180,6 +172,14 @@ class SudokuSolver {
       count += 1;
     }
     return currentRegion;
+  }
+
+  onlyUniqueNumbers(puzzleStringSubset) {
+    let numbers = puzzleStringSubset.replace(/\./g, "");
+    let numbersInString = numbers.length;
+
+    let uniqueNumbers = new Set(numbers.split(""));
+    return uniqueNumbers.size === numbers.length ? true : false;
   }
 }
 

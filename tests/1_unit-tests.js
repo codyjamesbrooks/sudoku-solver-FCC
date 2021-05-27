@@ -194,5 +194,3 @@ suite("UnitTests", () => {
     });
   });
 });
-
-// Solver returns the the expected solution for an incomplete puzzle
