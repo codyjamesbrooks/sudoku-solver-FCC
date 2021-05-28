@@ -82,7 +82,7 @@ suite("Functional Tests", () => {
     test("Valid placement, no conflicts", (done) => {
       chai
         .request(server)
-        .post("api/check")
+        .post("/api/check")
         .send(validCheckObject)
         .end((err, res) => {
           assert.equal(res.status, 200);
@@ -91,44 +91,163 @@ suite("Functional Tests", () => {
           done();
         });
     });
+    let oneConflictCheckObject = {
+      puzzle: "...1" + ".".repeat(77),
+      coordinate: "A1",
+      value: "1",
+    };
     test("Invalid placement, 1 conflict", (done) => {
-      // Check a puzzle placement with single placement conflict: POST request to /api/check
-      done();
+      chai
+        .request(server)
+        .post("/api/check")
+        .send(oneConflictCheckObject)
+        .end((err, res) => {
+          assert.equal(res.status, 200);
+          assert.equal(res.type, "application/json");
+          assert.equal(res.body.valid, false);
+          assert.isArray(res.body.conflict);
+          assert.equal(res.body.conflict.length, 1);
+          done();
+        });
     });
+    let twoConflictCheckObject = {
+      puzzle: "...1....." + ".".repeat(18) + "1........" + ".".repeat(45),
+      coordinate: "A1",
+      value: "1",
+    };
     test("Invalid placement, 2 conflicts", (done) => {
-      // Check a puzzle placement with multiple placement conflicts: POST request to /api/check
-      done();
+      chai
+        .request(server)
+        .post("/api/check")
+        .send(twoConflictCheckObject)
+        .end((err, res) => {
+          assert.equal(res.status, 200);
+          assert.equal(res.type, "application/json");
+          assert.equal(res.body.valid, false);
+          assert.isArray(res.body.conflict);
+          assert.equal(res.body.conflict.length, 2);
+          done();
+        });
     });
+    let threeConflictCheckObject = {
+      puzzle:
+        "...1....." + "..1......" + "........." + "1........" + ".".repeat(45),
+      coordinate: "A1",
+      value: "1",
+    };
     test("Invalid placement, 3 conflict (max conflicts)", (done) => {
-      // Check a puzzle placement with all placement conflicts: POST request to /api/check
-      done();
+      chai
+        .request(server)
+        .post("/api/check")
+        .send(threeConflictCheckObject)
+        .end((err, res) => {
+          assert.equal(res.status, 200);
+          assert.equal(res.type, "application/json");
+          assert.equal(res.body.valid, false);
+          assert.isArray(res.body.conflict);
+          assert.equal(res.body.conflict.length, 3);
+          done();
+        });
     });
   });
   suite(
     "Testing POST requests to /api/check with missing/invalid fields",
     () => {
       test("POST req missing puzzle parameter", (done) => {
-        // Check a puzzle placement with missing required fields: POST request to /api/check
-        done();
+        chai
+          .request(server)
+          .post("/api/check")
+          .send({ coordinate: "A1", value: "1" })
+          .end((err, res) => {
+            assert.equal(res.status, 200);
+            assert.equal(res.type, "application/json");
+            assert.deepEqual(res.body, { error: "Required field(s) missing" });
+            done();
+          });
       });
       test("POST req missing value and coordinate parameter", (done) => {
-        done();
+        chai
+          .request(server)
+          .post("/api/check")
+          .send({ puzzle: puzzles[0][0] })
+          .end((err, res) => {
+            assert.equal(res.status, 200);
+            assert.equal(res.type, "application/json");
+            assert.deepEqual(res.body, { error: "Required field(s) missing" });
+            done();
+          });
       });
+      let invalidCharCheckObject = {
+        puzzle: "A" + puzzles[0][0].slice(1),
+        coordinate: "A1",
+        value: "1",
+      };
       test("POST req with puzzle containing invalid characters", (done) => {
-        // Check a puzzle placement with invalid characters: POST request to /api/check
-        done();
+        chai
+          .request(server)
+          .post("/api/check")
+          .send(invalidCharCheckObject)
+          .end((err, res) => {
+            assert.equal(res.status, 200);
+            assert.equal(res.type, "application/json");
+            assert.deepEqual(res.body, {
+              error: "Invalid characters in puzzle",
+            });
+            done();
+          });
       });
+      let invalidLengthCheckObject = {
+        puzzle: puzzles[0][0].slice(1),
+        coordinate: "A1",
+        value: "1",
+      };
       test("POST req with puzzle string having incorrect length", (done) => {
-        // Check a puzzle placement with incorrect length: POST request to /api/check
-        done();
+        chai
+          .request(server)
+          .post("/api/check")
+          .send(invalidLengthCheckObject)
+          .end((err, res) => {
+            assert.equal(res.status, 200);
+            assert.equal(res.type, "application/json");
+            assert.deepEqual(res.body, {
+              error: "Expected puzzle to be 81 characters long",
+            });
+            done();
+          });
       });
+      let invalidCoordCheckObject = {
+        puzzle: puzzles[0][0],
+        coordinate: "Z1.5",
+        value: "1",
+      };
       test("POST req with invalid placement coordinate", (done) => {
-        // Check a puzzle placement with invalid placement coordinate: POST request to /api/check
-        done();
+        chai
+          .request(server)
+          .post("/api/check")
+          .send(invalidCoordCheckObject)
+          .end((err, res) => {
+            assert.equal(res.status, 200);
+            assert.equal(res.type, "application/json");
+            assert.deepEqual(res.body, { error: "Invalid coordinate" });
+            done();
+          });
       });
+      let invalidValueCheckObject = {
+        puzzle: puzzles[0][0],
+        coordinate: "A1",
+        value: "0",
+      };
       test("POST req with invalid value parameter", (done) => {
-        // Check a puzzle placement with invalid placement value: POST request to /api/check
-        done();
+        chai
+          .request(server)
+          .post("/api/check")
+          .send(invalidValueCheckObject)
+          .end((err, res) => {
+            assert.equal(res.status, 200);
+            assert.equal(res.type, "application/json");
+            assert.deepEqual(res.body, { error: "Invalid value" });
+            done();
+          });
       });
     }
   );

@@ -11,7 +11,7 @@ module.exports = function (app) {
   app.route("/api/check").post((req, res) => {
     // Ensure requred fields were submitted
     if (!req.body.puzzle || !req.body.coordinate || !req.body.value) {
-      return res.json({ error: "Required field(s) missing " });
+      return res.json({ error: "Required field(s) missing" });
     }
 
     // Ensure the puzzle submitted was valid;
@@ -40,12 +40,14 @@ module.exports = function (app) {
       column,
       value
     );
+
     let colConflict = solver.checkColPlacement(
       req.body.puzzle,
       row,
       column,
       value
     );
+
     let regionConflict = solver.checkRegionPlacement(
       req.body.puzzle,
       row,
@@ -53,12 +55,13 @@ module.exports = function (app) {
       value
     );
 
-    if (rowConflict.hasOwnProperty("error"))
-      conflictArray.push(rowConflict.error);
-    if (colConflict.hasOwnProperty("error"))
-      conflictArray.push(colConflict.error);
-    if (regionConflict.hasOwnProperty("error"))
-      conflictArray.push(regionConflict.error);
+    if (rowConflict.hasOwnProperty("conflict"))
+      conflictArray.push(rowConflict.conflict);
+    if (colConflict.hasOwnProperty("conflict"))
+      conflictArray.push(colConflict.conflict);
+    if (regionConflict.hasOwnProperty("conflict"))
+      conflictArray.push(regionConflict.conflict);
+
     if (conflictArray.length > 0)
       return res.json({ valid: false, conflict: conflictArray });
 
